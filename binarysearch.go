@@ -1,34 +1,39 @@
 package go_effect_sort
 
 func BinaryInsert[T any](oldSlice []T, val T, equalOrder EqualOrderExternal[T], greaterThan GreaterThanExternal[T], move Move[T]) (newSlice []T, insertIdx int) {
+	insertIdx = BinaryInsertIndex(oldSlice, val, equalOrder, greaterThan)
 	newSlice = append(oldSlice, val)
+	i := len(newSlice) - 2
+	for i >= insertIdx {
+		move(newSlice, i, i+1)
+		i -= 1
+	}
+	newSlice[insertIdx] = val
+	return
+}
+
+func BinaryInsertIndex[T any](oldSlice []T, val T, equalOrder EqualOrderExternal[T], greaterThan GreaterThanExternal[T]) (insertIdx int) {
 	var lo int = 0
-	var hi int = len(newSlice) - 1
-	var mid int = lo
+	var hi int = len(oldSlice)
+	insertIdx = lo
 	for {
 		if hi <= lo {
-			goto setMidToLo
+			goto setIdxToLo
 		}
-		mid = lo + ((hi - lo) >> 1)
-		if equalOrder(oldSlice, mid, val) {
-			goto moveUpAndIns
+		insertIdx = lo + ((hi - lo) >> 1)
+		if equalOrder(oldSlice, insertIdx, val) {
+			goto returnIdx
 		}
-		if greaterThan(newSlice, mid, val) {
-			hi = mid
+		if greaterThan(oldSlice, insertIdx, val) {
+			hi = insertIdx
 		} else {
-			lo = mid + 1
+			lo = insertIdx + 1
 		}
 	}
-setMidToLo:
-	mid = lo
-moveUpAndIns:
-	hi = len(newSlice) - 2
-	for hi >= mid {
-		move(newSlice, hi, hi+1)
-		hi -= 1
-	}
-	newSlice[mid] = val
-	return newSlice, mid
+setIdxToLo:
+	insertIdx = lo
+returnIdx:
+	return
 }
 
 func BinarySearch[T any](slice []T, val T, equalValue EqualValueExternal[T], greaterThan GreaterThanExternal[T]) (idx int, found bool) {

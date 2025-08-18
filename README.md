@@ -3,7 +3,7 @@ Golang slice sorting library that takes user functions for comparison and elemen
 
 ## Installation
 Run the following command in your project directory:
-```golang
+```
 go get github.com/gabe-lee/go_effect_sort@latest
 ```
 ## Usage Example
@@ -23,5 +23,8 @@ Hello World!
  !HWdellloor
 ```
 ## Supported Algorithms
-  - Insertion Sort (Remove compare val, move all larger vals up, re-insert compare val
+  - Binary Search
+  - Binary Insert
+  - Binary Insert Index Only (find insert idx without altering slice)
+  - Insertion Sort (Remove compare val, move all larger vals up, re-insert compare val)
   - Insertion Sort (swapping each element like a Bubble Sort)
