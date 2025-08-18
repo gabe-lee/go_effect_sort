@@ -55,3 +55,26 @@ func BinarySearch[T any](slice []T, val T, equalValue EqualValueExternal[T], gre
 		}
 	}
 }
+
+func BinaryAlter[T any](slice []T, alteredIdx int, equalOrder EqualOrderExternal[T], greaterThan GreaterThanExternal[T], move Move[T]) (newIdx int) {
+	newIdx = BinaryInsertIndex(slice, slice[alteredIdx], equalOrder, greaterThan)
+	if newIdx == alteredIdx {
+		return
+	}
+	val := slice[alteredIdx]
+	if newIdx < alteredIdx {
+		i := alteredIdx - 1
+		for i >= newIdx {
+			move(slice, i, i+1)
+			i -= 1
+		}
+	} else {
+		i := alteredIdx + 1
+		for i <= newIdx {
+			move(slice, i, i-1)
+			i += 1
+		}
+	}
+	slice[newIdx] = val
+	return
+}

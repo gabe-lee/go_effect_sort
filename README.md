@@ -26,5 +26,6 @@ Hello World!
   - Binary Search
   - Binary Insert
   - Binary Insert Index Only (find insert idx without altering slice)
+  - Binary Alter (one existing item is re-sorted)
   - Insertion Sort (Remove compare val, move all larger vals up, re-insert compare val)
   - Insertion Sort (swapping each element like a Bubble Sort)
