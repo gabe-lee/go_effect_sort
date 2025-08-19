@@ -23,7 +23,7 @@ func FuzzInsertionSort(f *testing.F) {
 			oldSum += uint64(b) + 1
 		}
 		aa := ll.New(&a)
-		InsertionSort(&aa, GreaterThanOrdExt, RemoveNoSideEffect, MoveNoSideEffect, InsertNoSideEffect)
+		InsertionSort(aa, GreaterThanOrdExt, RemoveNoSideEffect, MoveNoSideEffect, InsertNoSideEffect)
 		newLen := len(a)
 		if oldLen != newLen {
 			t.Errorf("\ntest case failed: len mismatch\nSLICE: %v\nEXP LEN: %d\nGOT LEN: %d\n", a, oldLen, newLen)

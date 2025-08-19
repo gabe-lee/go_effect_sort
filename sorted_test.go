@@ -29,7 +29,7 @@ func FuzzSorted_Insert(f *testing.F) {
 		var expSum = sum + uint64(b) + 1
 		var expLen = len(a) + 1
 		aa := ll.New(&a)
-		Sorted_Insert(&aa, b, EqualOrderOrdExt, GreaterThanOrdExt, MoveNoSideEffect)
+		Sorted_Insert(aa, b, EqualOrderOrdExt, GreaterThanOrdExt, MoveNoSideEffect)
 		var gotSum uint64 = 0
 		var gotLen = aa.Len()
 		if gotLen != expLen {
@@ -89,7 +89,7 @@ func FuzzSorted_Search(f *testing.F) {
 			}
 		}
 		aa := ll.New(&a)
-		foundIdx, found := Sorted_Search(&aa, b, EqualValueOrdExt, GreaterThanOrdExt)
+		foundIdx, found := Sorted_Search(aa, b, EqualValueOrdExt, GreaterThanOrdExt)
 		if found && !existsInList {
 			t.Errorf("\ntest case failed: value does not exist in list but was 'found' by BinarySearch\nSEARCH VAL: %d\nSLICE: %v\nBAD FOUND IDX: %d\n", b, a, foundIdx)
 		}
