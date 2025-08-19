@@ -1,34 +1,27 @@
 package go_effect_sort
 
-import "cmp"
+import (
+	"cmp"
+
+	ll "github.com/gabe-lee/go_list_like"
+)
+
+// Convenience wrapper around `github.com/gabe-lee/go_slice_like.New()`
+func NewSliceLike[T any](slicePtr *[]T) ll.SliceAdapter[T] {
+	return ll.New(slicePtr)
+}
+
+type Index interface {
+	~uint | ~uint8 | ~uint16 | ~uint32 | ~uint64 | ~uintptr |
+		~int | ~int8 | ~int16 | ~int32 | ~int64
+}
 
 type Empty = struct{}
 
-type LessThan[T any] func(slice []T, aIdx int, bIdx int) bool
-type LessThanOrEqual[T any] func(slice []T, aIdx int, bIdx int) bool
-type GreaterThan[T any] func(slice []T, aIdx int, bIdx int) bool
-type GreaterThanOrEqual[T any] func(slice []T, aIdx int, bIdx int) bool
-type EqualOrder[T any] func(slice []T, aIdx int, bIdx int) bool
-type UnequalOrder[T any] func(slice []T, aIdx int, bIdx int) bool
-type EqualValue[T any] func(slice []T, aIdx int, bIdx int) bool
-type UnequalValue[T any] func(slice []T, aIdx int, bIdx int) bool
-type LessThanExternal[T any] func(slice []T, idx int, val T) bool
-type LessThanOrEqualExternal[T any] func(slice []T, idx int, val T) bool
-type GreaterThanExternal[T any] func(slice []T, idx int, val T) bool
-type GreaterThanOrEqualExternal[T any] func(slice []T, idx int, val T) bool
-type EqualOrderExternal[T any] func(slice []T, idx int, val T) bool
-type UnequalOrderExternal[T any] func(slice []T, idx int, val T) bool
-type EqualValueExternal[T any] func(slice []T, idx int, val T) bool
-type UnequalValueExternal[T any] func(slice []T, idx int, val T) bool
-type Swap[T any] func(slice []T, aIdx int, bIdx int)
-type Move[T any] func(slice []T, old int, new int)
-type Remove[T any, X any] func(slice []T, idx int) (val T, effectVals X)
-type Insert[T any, X any] func(slice []T, idx int, val T, effectVals X)
-
-func IsSorted[T any](slice []T, greaterThan GreaterThan[T]) bool {
+func IsSorted[T any](slice ll.ListLike[T], greaterThan func(slice ll.SliceLike[T], aIdx int, bIdx int) bool) bool {
 	var i int = 0
 	var ii int = 1
-	var n int = len(slice)
+	var n int = slice.Len()
 	for ii < n {
 		if greaterThan(slice, i, ii) {
 			return false
@@ -39,65 +32,117 @@ func IsSorted[T any](slice []T, greaterThan GreaterThan[T]) bool {
 	return true
 }
 
-func LessThanOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] < slice[bIdx]
+func LessThanOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) < *slice.GetPtr(bIdx)
 }
-func LessThanOrEqualOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] <= slice[bIdx]
+func LessThanOrEqualOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) <= *slice.GetPtr(bIdx)
 }
-func GreaterThanOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] > slice[bIdx]
+func GreaterThanOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) > *slice.GetPtr(bIdx)
 }
-func GreaterThanOrEqualOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] >= slice[bIdx]
+func GreaterThanOrEqualOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) >= *slice.GetPtr(bIdx)
 }
-func EqualOrderOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] == slice[bIdx]
+func EqualOrderOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) == *slice.GetPtr(bIdx)
 }
-func UnequalOrderOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] != slice[bIdx]
+func UnequalOrderOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) != *slice.GetPtr(bIdx)
 }
-func EqualValueOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] == slice[bIdx]
+func EqualValueOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) == *slice.GetPtr(bIdx)
 }
-func UnequalValueOrd[T cmp.Ordered](slice []T, aIdx int, bIdx int) bool {
-	return slice[aIdx] != slice[bIdx]
+func UnequalValueOrd[T cmp.Ordered](slice ll.SliceLike[T], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(aIdx) != *slice.GetPtr(bIdx)
 }
-func LessThanOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] < val
+
+func LessThanOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) < *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func LessThanOrEqualOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] <= val
+func LessThanOrEqualOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) <= *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func GreaterThanOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] > val
+func GreaterThanOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) > *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func GreaterThanOrEqualOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] >= val
+func GreaterThanOrEqualOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) >= *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func EqualOrderOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] == val
+func EqualOrderOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) == *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func UnequalOrderOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] != val
+func UnequalOrderOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) != *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func EqualValueOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] == val
+func EqualValueOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) == *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func UnequalValueOrdExt[T cmp.Ordered](slice []T, idx int, val T) bool {
-	return slice[idx] != val
+func UnequalValueOrdMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], aIdx int, bIdx int) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(aIdx))) != *slice.GetPtr(int(*idxMap.GetPtr(bIdx)))
 }
-func SwapNoSideEffect[T any](slice []T, aIdx int, bIdx int) {
-	tmp := slice[aIdx]
-	slice[aIdx] = slice[bIdx]
-	slice[bIdx] = tmp
+
+func LessThanOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) < val
 }
-func MoveNoSideEffect[T any](slice []T, old int, new int) {
-	slice[new] = slice[old]
+func LessThanOrEqualOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) <= val
 }
-func RemoveNoSideEffect[T any](slice []T, idx int) (val T, effectVals Empty) {
-	return slice[idx], Empty{}
+func GreaterThanOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) > val
 }
-func InsertNoSideEffect[T any](slice []T, idx int, val T, effectVals Empty) {
-	slice[idx] = val
+func GreaterThanOrEqualOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) >= val
+}
+func EqualOrderOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) == val
+}
+func UnequalOrderOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) != val
+}
+func EqualValueOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) == val
+}
+func UnequalValueOrdExt[T cmp.Ordered](slice ll.SliceLike[T], idx int, val T) bool {
+	return *slice.GetPtr(idx) != val
+}
+
+func LessThanOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) < val
+}
+func LessThanOrEqualOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) <= val
+}
+func GreaterThanOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) > val
+}
+func GreaterThanOrEqualOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) >= val
+}
+func EqualOrderOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) == val
+}
+func UnequalOrderOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) != val
+}
+func EqualValueOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) == val
+}
+func UnequalValueOrdExtMapped[T cmp.Ordered, I Index](slice ll.SliceLike[T], idxMap ll.SliceLike[I], idx int, val T) bool {
+	return *slice.GetPtr(int(*idxMap.GetPtr(idx))) != val
+}
+
+func SwapNoSideEffect[T any](slice ll.SliceLike[T], aIdx int, bIdx int) {
+	tmp := *slice.GetPtr(aIdx)
+	*slice.GetPtr(aIdx) = *slice.GetPtr(bIdx)
+	*slice.GetPtr(bIdx) = tmp
+}
+func MoveNoSideEffect[T any](slice ll.SliceLike[T], old int, new int) {
+	*slice.GetPtr(new) = *slice.GetPtr(old)
+}
+func RemoveNoSideEffect[T any](slice ll.ListLike[T], idx int) (val T) {
+	return *slice.GetPtr(idx)
+}
+func InsertNoSideEffect[T any](slice ll.ListLike[T], idx int, val T) {
+	*slice.GetPtr(idx) = val
 }

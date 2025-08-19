@@ -3,9 +3,11 @@ package go_effect_sort
 import (
 	"slices"
 	"testing"
+
+	ll "github.com/gabe-lee/go_list_like"
 )
 
-func FuzzBinaryInsert(f *testing.F) {
+func FuzzSorted_Insert(f *testing.F) {
 	var nilSlice []byte
 	var emptySlice []byte = make([]byte, 0, 10)
 	f.Add(nilSlice, byte(5))
@@ -26,13 +28,15 @@ func FuzzBinaryInsert(f *testing.F) {
 		}
 		var expSum = sum + uint64(b) + 1
 		var expLen = len(a) + 1
-		aa, _ := BinaryInsert(a, b, EqualOrderOrdExt, GreaterThanOrdExt, MoveNoSideEffect)
+		aa := ll.New(&a)
+		Sorted_Insert(&aa, b, EqualOrderOrdExt, GreaterThanOrdExt, MoveNoSideEffect)
 		var gotSum uint64 = 0
-		var gotLen = len(aa)
+		var gotLen = aa.Len()
 		if gotLen != expLen {
 			t.Errorf("\ntest case failed: len mismatch\nINSERT VAL: %d\nOLD SLICE: %v\nNEW SLICE: %v\nEXP LEN: %d\nGOT LEN: %d\n", b, a, aa, expLen, gotLen)
 		}
-		for _, b := range aa {
+		for i := range aa.Len() {
+			b := ll.Get(&aa, i)
 			gotSum += uint64(b) + 1
 		}
 		if gotSum != expSum {
@@ -41,8 +45,8 @@ func FuzzBinaryInsert(f *testing.F) {
 		var ii int = 1
 		var i int = 0
 		for ii < gotLen {
-			if aa[i] > aa[ii] {
-				t.Errorf("\ntest case failed: not sorted\nINSERT VAL: %d\nOLD SLICE: %v\nNEW SLICE: %v\nVAL : %d > %d\nIDX: %d < %d\n", b, a, aa, aa[i], aa[ii], i, ii)
+			if ll.Get(&aa, i) > ll.Get(&aa, ii) {
+				t.Errorf("\ntest case failed: not sorted\nINSERT VAL: %d\nOLD SLICE: %v\nNEW SLICE: %v\nVAL : %d > %d\nIDX: %d < %d\n", b, a, aa, ll.Get(&aa, i), ll.Get(&aa, ii), i, ii)
 			}
 			i += 1
 			ii += 1
@@ -50,7 +54,7 @@ func FuzzBinaryInsert(f *testing.F) {
 	})
 }
 
-func FuzzBinarySearch(f *testing.F) {
+func FuzzSorted_Search(f *testing.F) {
 	var nilSlice []byte
 	var emptySlice []byte = make([]byte, 0, 10)
 	f.Add(nilSlice, byte(5))
@@ -84,7 +88,8 @@ func FuzzBinarySearch(f *testing.F) {
 				}
 			}
 		}
-		foundIdx, found := BinarySearch(a, b, EqualValueOrdExt, GreaterThanOrdExt)
+		aa := ll.New(&a)
+		foundIdx, found := Sorted_Search(&aa, b, EqualValueOrdExt, GreaterThanOrdExt)
 		if found && !existsInList {
 			t.Errorf("\ntest case failed: value does not exist in list but was 'found' by BinarySearch\nSEARCH VAL: %d\nSLICE: %v\nBAD FOUND IDX: %d\n", b, a, foundIdx)
 		}

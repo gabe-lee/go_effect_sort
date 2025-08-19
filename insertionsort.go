@@ -1,33 +1,17 @@
 package go_effect_sort
 
-func InsertionSortSwap[T any](slice []T, greaterThan GreaterThan[T], swap Swap[T]) {
-	var n int = len(slice)
-	var i int = 1
-	var j int
-	var jj int
-	for i < n {
-		j = i - 1
-		jj = i
-		for j >= 0 && greaterThan(slice, j, jj) {
-			swap(slice, j, jj)
-			j -= 1
-			jj -= 1
-		}
-		i += 1
-	}
-}
+import (
+	ll "github.com/gabe-lee/go_list_like"
+)
 
-// This may be faster than `InsertionSortSwap` if swapping two elements is a heavy operation,
-// but requires additional user work to provide remove/move/insert funcs and a type for `effectVals` (X)
-func InsertionSortRemoveMoveInsert[T any, X any](slice []T, greaterThan GreaterThanExternal[T], remove Remove[T, X], move Move[T], insert Insert[T, X]) {
-	var n int = len(slice)
+func InsertionSort[T any](slice ll.ListLike[T], greaterThan func(slice ll.SliceLike[T], idx int, val T) bool, remove func(slice ll.ListLike[T], idx int) (val T), move func(slice ll.SliceLike[T], old int, new int), insert func(slice ll.ListLike[T], idx int, val T)) {
+	var n int = slice.Len()
 	var i int = 1
 	var j int
 	var jj int
 	var elem T
-	var elemEffects X
 	for i < n {
-		elem, elemEffects = remove(slice, i)
+		elem = remove(slice, i)
 		j = i - 1
 		jj = i
 		for j >= 0 && greaterThan(slice, j, elem) {
@@ -35,7 +19,7 @@ func InsertionSortRemoveMoveInsert[T any, X any](slice []T, greaterThan GreaterT
 			j -= 1
 			jj -= 1
 		}
-		insert(slice, jj, elem, elemEffects)
+		insert(slice, jj, elem)
 		i += 1
 	}
 }
