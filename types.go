@@ -8,7 +8,7 @@ import (
 
 // Convenience wrapper around `github.com/gabe-lee/go_slice_like.New()`
 func NewSliceLike[T any](slicePtr *[]T) ll.SliceAdapter[T] {
-	return ll.New(slicePtr)
+	return ll.NewSliceAdapter(slicePtr)
 }
 
 type Index interface {
