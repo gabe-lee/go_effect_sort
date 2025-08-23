@@ -4,3 +4,9 @@ github.com/gabe-lee/go_list_like v0.6.0 h1:tgQvbjTmcRqpoYVjvfinMmtg4z5OS2vUSU2jn
 github.com/gabe-lee/go_list_like v0.6.0/go.mod h1:lACAClhTJZzB2ecNdreFQXRaOI/eJaph+qHlfsUciis=
 github.com/gabe-lee/go_list_like v0.8.0 h1:e7OGQfEzn0zLqZ6GmOYFNQhWstmd3lE8APr+mSpW6UU=
 github.com/gabe-lee/go_list_like v0.8.0/go.mod h1:NpwyR8Pue1Et2+7b7NmArxVx3m/kOhe4bsKpb9ArGiY=
+github.com/gabe-lee/go_list_like v0.9.0 h1:SsBuwIMhcspif/XpwR0cwGxDFsr89uo2Wi0/3YzVSQg=
+github.com/gabe-lee/go_list_like v0.9.0/go.mod h1:NpwyR8Pue1Et2+7b7NmArxVx3m/kOhe4bsKpb9ArGiY=
+github.com/gabe-lee/go_list_like v0.10.0 h1:SGBO756ZNfCbOJ5pzHChq+DBXAHL/oMrJguYzsM/eY8=
+github.com/gabe-lee/go_list_like v0.10.0/go.mod h1:NpwyR8Pue1Et2+7b7NmArxVx3m/kOhe4bsKpb9ArGiY=
+github.com/gabe-lee/go_list_like v0.11.0 h1:mZa0/an0A00GfN/DcGBiUgikyAc+sYIk/TJwXRwXn9Q=
+github.com/gabe-lee/go_list_like v0.11.0/go.mod h1:NpwyR8Pue1Et2+7b7NmArxVx3m/kOhe4bsKpb9ArGiY=

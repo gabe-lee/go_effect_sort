@@ -6,7 +6,7 @@ import (
 
 func Sorted_Insert[T any](list ll.ListLike[T], val T, equalOrder func(list ll.SliceLike[T], idx int, val T) bool, greaterThan func(list ll.SliceLike[T], idx int, val T) bool, move func(list ll.SliceLike[T], oldIdx int, newIdx int)) (insertIdx int) {
 	insertIdx = Sorted_InsertIndex(list, val, equalOrder, greaterThan)
-	ll.Append(list, val)
+	ll.AppendV(list, val)
 	i := list.Len() - 2
 	for i >= insertIdx {
 		move(list, i, i+1)
@@ -21,7 +21,7 @@ func Sorted_InsertWithMaps[T any, I Index](list ll.ListLike[T], val T, equalOrde
 	for _, m := range indexMaps {
 		m.MoveIndexesUp(list, I(insertIdx))
 		mapAppendIdx := m.Indexes.Len()
-		ll.Append(m.Indexes, I(insertIdx))
+		ll.AppendV(m.Indexes, I(insertIdx))
 		m.ResortAltered(list, mapAppendIdx)
 	}
 	return

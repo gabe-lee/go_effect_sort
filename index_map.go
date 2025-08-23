@@ -27,7 +27,7 @@ func (m IndexMap[T, I]) ShiftIndexUp(list ll.ListLike[T], oldMovedIndex, newMove
 	var count I = 0
 	found = false
 	for i := range m.Indexes.Len() {
-		v := *m.Indexes.GetPtr(i)
+		v := m.Indexes.Get(i)
 		if v == oldMovedIndex {
 			found = true
 			mappedIdx = i
@@ -35,7 +35,7 @@ func (m IndexMap[T, I]) ShiftIndexUp(list ll.ListLike[T], oldMovedIndex, newMove
 				break
 			}
 		} else if v > oldMovedIndex && v <= newMovedIndex {
-			*m.Indexes.GetPtr(i) -= 1
+			ll.SetSubtract(m.Indexes, i, 1)
 			count += 1
 			if count >= maxCount && found {
 				break
@@ -43,7 +43,7 @@ func (m IndexMap[T, I]) ShiftIndexUp(list ll.ListLike[T], oldMovedIndex, newMove
 		}
 	}
 	if found {
-		*m.Indexes.GetPtr(mappedIdx) = newMovedIndex
+		m.Indexes.Set(mappedIdx, newMovedIndex)
 	}
 	return
 }
@@ -51,9 +51,9 @@ func (m IndexMap[T, I]) MoveIndexesUp(list ll.ListLike[T], startIdx I) {
 	var maxCount I = I(list.Len()) - startIdx
 	var count I = 0
 	for i := range m.Indexes.Len() {
-		v := *m.Indexes.GetPtr(i)
+		v := m.Indexes.Get(i)
 		if v >= startIdx {
-			*m.Indexes.GetPtr(i) += 1
+			ll.SetAdd(m.Indexes, i, 1)
 			count += 1
 			if count >= maxCount {
 				break
@@ -66,9 +66,9 @@ func (m IndexMap[T, I]) MoveIndexesDown(list ll.ListLike[T], startIdx I) {
 	var maxCount I = I(list.Len()) - startIdx
 	var count I = 0
 	for i := range m.Indexes.Len() {
-		v := *m.Indexes.GetPtr(i)
+		v := m.Indexes.Get(i)
 		if v >= startIdx {
-			*m.Indexes.GetPtr(i) -= 1
+			ll.SetSubtract(m.Indexes, i, 1)
 			count += 1
 			if count >= maxCount {
 				break
@@ -82,7 +82,7 @@ func (m IndexMap[T, I]) ShiftIndexDown(list ll.ListLike[T], oldMovedIndex, newMo
 	var count I = 0
 	found = false
 	for i := range m.Indexes.Len() {
-		v := *m.Indexes.GetPtr(i)
+		v := m.Indexes.Get(i)
 		if v == oldMovedIndex {
 			found = true
 			mappedIdx = i
@@ -90,7 +90,7 @@ func (m IndexMap[T, I]) ShiftIndexDown(list ll.ListLike[T], oldMovedIndex, newMo
 				break
 			}
 		} else if v < oldMovedIndex && v >= newMovedIndex {
-			*m.Indexes.GetPtr(i) += 1
+			ll.SetAdd(m.Indexes, i, 1)
 			count += 1
 			if count >= maxCount && found {
 				break
@@ -98,20 +98,20 @@ func (m IndexMap[T, I]) ShiftIndexDown(list ll.ListLike[T], oldMovedIndex, newMo
 		}
 	}
 	if found {
-		*m.Indexes.GetPtr(mappedIdx) = newMovedIndex
+		m.Indexes.Set(mappedIdx, newMovedIndex)
 	}
 	return
 }
 
 func (m IndexMap[T, I]) ResortAltered(list ll.ListLike[T], mapIdx int) {
-	val := *m.Indexes.GetPtr(mapIdx)
+	val := m.Indexes.Get(mapIdx)
 	for mapIdx > 0 && m.LessThan(list, m.Indexes, mapIdx, mapIdx-1) {
-		*m.Indexes.GetPtr(mapIdx) = *m.Indexes.GetPtr(mapIdx - 1)
+		ll.Move(m.Indexes, mapIdx-1, mapIdx)
 		mapIdx -= 1
 	}
 	for mapIdx < m.Indexes.Len()-1 && m.GreaterThan(list, m.Indexes, mapIdx, mapIdx+1) {
-		*m.Indexes.GetPtr(mapIdx) = *m.Indexes.GetPtr(mapIdx + 1)
+		ll.Move(m.Indexes, mapIdx+1, mapIdx)
 		mapIdx += 1
 	}
-	*m.Indexes.GetPtr(mapIdx) = val
+	m.Indexes.Set(mapIdx, val)
 }
