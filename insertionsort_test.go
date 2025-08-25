@@ -22,7 +22,7 @@ func FuzzInsertionSort(f *testing.F) {
 		for _, b := range a {
 			oldSum += uint64(b) + 1
 		}
-		aa := ll.NewSliceAdapter(&a)
+		aa := ll.NewSliceAdapterIndirect(&a)
 		InsertionSort(aa, GreaterThanOrdExt, RemoveNoSideEffect, MoveNoSideEffect, InsertNoSideEffect)
 		newLen := len(a)
 		if oldLen != newLen {
